@@ -15,6 +15,7 @@ use test_alarm::actors::*;
 async fn real_time(
     binance_futures_api: BinanceFuturesApi,
     symbols: &Vec<Value>,
+    name: &str,
     mut ssh_api: SshClient,
     wx_robot: WxbotHttpClient,
     ori_fund: f64,
@@ -25,7 +26,7 @@ async fn real_time(
     let week_npl = -0.82056;
     // let mut day_pnl = 0.0;
 
-    // let mut i = 0;
+    let mut i = 0;
     // let mut end = 6;
 
     // 每个品种的上一个trade_id
@@ -100,6 +101,19 @@ async fn real_time(
             let v: Value = serde_json::from_str(&data).unwrap();
             let vec = v.as_array().unwrap();
             println!("获取到的账户挂单信息:{:?}", vec);
+            if vec.len() == 0 {
+                if i != 0 {
+                    let sender = format!("{}账号:", name);
+                    let content = format!("一分钟内没有新挂单");
+                    wx_robot.send_text(&sender, &content).await;
+                }
+                i += 1;
+
+            } else {
+                for a in 0..vec.len() {
+                    println!("11111{}", vec[a]);
+                }
+            }
             // net_worth = notional_total/ori_fund;
             // net_worth_histories.push_back(Value::from(new_account_object));
         }
@@ -228,6 +242,7 @@ async fn main() {
         // let mut futures_config: Map<String, Value> = Map::new();
         // let mut servers_config = Map::new();
         let binance_config = config.get("Binance").unwrap();
+        let name = binance_config.get("futures").unwrap().get("name").unwrap().as_str().unwrap();
         // let binance_future_config = binance_config.get("futures").unwrap();
         let server_config = config.get("Server").unwrap();
         let symbols = config.get("Symbols").unwrap().as_array().unwrap();
@@ -306,7 +321,7 @@ async fn main() {
         
         info!("created http client");
 
-            real_time(binance_futures_api, symbols, ssh_api, wx_robot, 500.0).await;
+            real_time(binance_futures_api, symbols, name, ssh_api, wx_robot, 500.0).await;
         
     });
 
