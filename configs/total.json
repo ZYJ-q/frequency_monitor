@@ -20,9 +20,9 @@
         },
         "futures": {
             "base_url": "https://fapi.binance.com",
-            "api_key": "sTaGlpvF3ElwOvcHrw0CAt1bApbF1Kx8MDcT01e7xJ8q1zsOVklGy0XPbkbpurIi",
-            "secret_key": "3rPwBJziDpbFAesnyt1OeXADc7UXstPaYJc6g5I8jvWgu3LpgXMs60uLksPe2IcF",
-            "name": "trader02",
+            "api_key": "YJ1N9IZvxjWHAJBNAT5yDeMwyQ4kEc2gxafVcGMoiNg3GFXwJBf5cwIqfh06iwuX",
+            "secret_key": "yvQhcfz9H76HKv2VEGkytvjFKjmMv1oksTj1uvOAnZJIaqEsNO1nyioxbhjQZQN3",
+            "name": "Angus",
             "init_fund": 500
         }
     },

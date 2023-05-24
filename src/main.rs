@@ -103,7 +103,7 @@ async fn real_time(
             println!("获取到的账户挂单信息:{:?}", vec);
             if vec.len() == 0 {
                 if i != 0 {
-                    let sender = format!("{}账号:", name);
+                    let sender = format!("{}账号", name);
                     let content = format!("一分钟内没有新挂单");
                     wx_robot.send_text(&sender, &content).await;
                 }
