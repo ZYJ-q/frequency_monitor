@@ -20,9 +20,9 @@
         },
         "futures": {
             "base_url": "https://fapi.binance.com",
-            "api_key": "opn9TnS2LEnO6BLgOxACTZ8dWH78hg4vD22cVdLBTPmCFbnc6lWwBYiiziX9xha6",
-            "secret_key": "Flp3wHgt7jKZecgpuui586LSLeKEkQ0Jvu1nR6fmHYf32FO8VwNx8eLeXqIzKMlT",
-            "name": "trader03@flowtrade.tech",
+            "api_key": "YJ1N9IZvxjWHAJBNAT5yDeMwyQ4kEc2gxafVcGMoiNg3GFXwJBf5cwIqfh06iwuX",
+            "secret_key": "yvQhcfz9H76HKv2VEGkytvjFKjmMv1oksTj1uvOAnZJIaqEsNO1nyioxbhjQZQN3",
+            "name": "Angus",
             "init_fund": 500
         }
     },
