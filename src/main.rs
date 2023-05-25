@@ -1,8 +1,6 @@
-use std::collections::VecDeque;
+
 use std::{collections::HashMap, fs, time::Duration};
-use chrono::Local;
-use chrono::{DateTime, NaiveDateTime, Utc};
-use log::{debug, info, warn};
+use log::{info, warn};
 use serde_json::{Map, Value};
 // use tokio::{sync::broadcast::{self, Receiver}};
 use test_alarm::adapters::binance::futures::http::actions::BinanceFuturesApi;
@@ -13,17 +11,13 @@ use test_alarm::actors::*;
 
 #[warn(unused_mut, unused_variables, dead_code)]
 async fn real_time(
-    binance_futures_api: BinanceFuturesApi,
+    binance: &Vec<Value>,
     symbols: &Vec<Value>,
-    name: &str,
-    mut ssh_api: SshClient,
     wx_robot: WxbotHttpClient,
-    ori_fund: f64,
 ) {
     //rece: &mut Receiver<&str>){
     info!("get ready for real time loop");
     let running = true;
-    let week_npl = -0.82056;
     // let mut day_pnl = 0.0;
 
     let mut i = 0;
@@ -95,113 +89,48 @@ async fn real_time(
 
         print!("running的值是否被改变{}", running);
 
-
-        // 获取账户所有挂单
-        if let Some(data) = binance_futures_api.get_open_orders(None).await {
-            let v: Value = serde_json::from_str(&data).unwrap();
-            let vec = v.as_array().unwrap();
-            println!("获取到的账户挂单信息:{:?}", vec);
-            if vec.len() == 0 {
-                if i != 0 {
-                    let sender = format!("{}账号", name);
-                    let content = format!("一分钟内没有新挂单");
-                    wx_robot.send_text(&sender, &content).await;
+        for f_config in binance {
+            let binance_config = f_config.as_object().unwrap();
+            let binance_futures_api=BinanceFuturesApi::new(
+                binance_config
+                    .get("base_url")
+                    .unwrap()
+                    .as_str()
+                    .unwrap(),
+                binance_config
+                    .get("api_key")
+                    .unwrap()
+                    .as_str()
+                    .unwrap(),
+                binance_config
+                    .get("secret_key")
+                    .unwrap()
+                    .as_str()
+                    .unwrap(),
+            );
+            let name = binance_config.get("name").unwrap().as_str().unwrap();
+            if let Some(data) = binance_futures_api.get_open_orders(None).await {
+                let v: Value = serde_json::from_str(&data).unwrap();
+                let vec = v.as_array().unwrap();
+                println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
+                if vec.len() == 0 {
+                    if i != 0 {
+                        let sender = format!("{}账号", name);
+                        let content = format!("一分钟内没有新挂单");
+                        wx_robot.send_text(&sender, &content).await;
+                    }
+                    i += 1;
+    
+                } else {
+                    for a in 0..vec.len() {
+                        println!("11111{}", vec[a]);
+                    }
                 }
-                i += 1;
-
-            } else {
-                for a in 0..vec.len() {
-                    println!("11111{}", vec[a]);
-                }
+                // net_worth = notional_total/ori_fund;
+                // net_worth_histories.push_back(Value::from(new_account_object));
             }
-            // net_worth = notional_total/ori_fund;
-            // net_worth_histories.push_back(Value::from(new_account_object));
         }
 
-        // 时间
-        // map.insert(String::from("time"), Value::from(date));
-
-        // 账户余额
-        info!("account balance");
-    // let mut total_equity = 0.00;
-    // let mut net_worth: f64 = f64::INFINITY;
-    // let mut new_account_object: Map<String, Value> = Map::new();
-    let mut account_object: Map<String, Value> = Map::new();
-    if let Some(data) = binance_futures_api.account(None).await {
-        let v: Value = serde_json::from_str(&data).unwrap();
-        let wallet_total: f64 = v
-            .as_object()
-            .unwrap()
-            .get("totalWalletBalance")
-            .unwrap()
-            .as_str()
-            .unwrap()
-            .parse()
-            .unwrap();
-        let pnl_total: f64 = v
-            .as_object()
-            .unwrap()
-            .get("totalUnrealizedProfit")
-            .unwrap()
-            .as_str()
-            .unwrap()
-            .parse()
-            .unwrap();
-        let notional_total = wallet_total + pnl_total + week_npl; // 权益 = 余额 + 未实现盈亏
-        let leverage_total = wallet_total / notional_total; // 杠杆率 = 余额 / 权益
-        // let total_equity = wallet_total + pnl_total;
-        let margin_balance: f64 = v
-            .as_object()
-            .unwrap()
-            .get("totalMarginBalance")
-            .unwrap()
-            .as_str()
-            .unwrap()
-            .parse()
-            .unwrap();
-        // new_account_object.insert(
-        //     String::from("total_equity"),
-        //     Value::from(total_equity.to_string()),
-        // );
-        // new_account_object.insert(
-        //     String::from("time"), 
-        //     Value::from(date),
-        // );
-        account_object.insert(
-            String::from("wallet"),
-            Value::from(wallet_total.to_string()),
-        );
-        account_object.insert(
-            String::from("notional"),
-            Value::from(notional_total.to_string()),
-        );
-        account_object.insert(
-            String::from("leverage"),
-            Value::from(leverage_total.to_string()),
-        );
-        account_object.insert(
-            String::from("margin"),
-            Value::from(margin_balance.to_string()),
-        );
-        // net_worth = notional_total/ori_fund;
-        // net_worth_histories.push_back(Value::from(new_account_object));
-    }
-    map.insert(String::from("account"), Value::from(account_object));
-
-
-// println!("输出权益:{}, origins:{}", total_equity, ori_fund);
-
-
-        
-
-        // 成交历史(更新所有)
-
-        
-        
-
-        // 仓位
-
-        // 装入文件
 
         
 
@@ -242,8 +171,7 @@ async fn main() {
         // let mut futures_config: Map<String, Value> = Map::new();
         // let mut servers_config = Map::new();
         let binance_config = config.get("Binance").unwrap();
-        let name = binance_config.get("futures").unwrap().get("name").unwrap().as_str().unwrap();
-        // let binance_future_config = binance_config.get("futures").unwrap();
+        let binance_future_config = binance_config.get("futures").unwrap().as_array().unwrap();
         let server_config = config.get("Server").unwrap();
         let symbols = config.get("Symbols").unwrap().as_array().unwrap();
         let key = config.get("Alarm").unwrap().get("webhook").unwrap().as_str().unwrap();
@@ -294,34 +222,34 @@ async fn main() {
         // }
 
         info!("created ssh client");
-        let binance_futures_api=BinanceFuturesApi::new(
-            binance_config
-                .get("futures")
-                .unwrap()
-                .get("base_url")
-                .unwrap()
-                .as_str()
-                .unwrap(),
-            binance_config
-                .get("futures")
-                .unwrap()
-                .get("api_key")
-                .unwrap()
-                .as_str()
-                .unwrap(),
-            binance_config
-                .get("futures")
-                .unwrap()
-                .get("secret_key")
-                .unwrap()
-                .as_str()
-                .unwrap(),
-        );
+        // let binance_futures_api=BinanceFuturesApi::new(
+        //     binance_config
+        //         .get("futures")
+        //         .unwrap()
+        //         .get("base_url")
+        //         .unwrap()
+        //         .as_str()
+        //         .unwrap(),
+        //     binance_config
+        //         .get("futures")
+        //         .unwrap()
+        //         .get("api_key")
+        //         .unwrap()
+        //         .as_str()
+        //         .unwrap(),
+        //     binance_config
+        //         .get("futures")
+        //         .unwrap()
+        //         .get("secret_key")
+        //         .unwrap()
+        //         .as_str()
+        //         .unwrap(),
+        // );
 
         
         info!("created http client");
 
-            real_time(binance_futures_api, symbols, name, ssh_api, wx_robot, 500.0).await;
+            real_time(binance_future_config, symbols, wx_robot).await;
         
     });
 
