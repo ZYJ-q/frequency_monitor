@@ -178,7 +178,7 @@ async fn real_time(
 
                         // println!("11111{}", vec[a]);
                     }
-                    trade_mapper::TradeMapper::delect_open_orders(name);
+                    // trade_mapper::TradeMapper::delect_open_orders(name);
 
             let res = trade_mapper::TradeMapper::insert_open_orders(Vec::from(history_open_orders.clone()), name);
             println!("插入挂单数据是否成功{}, 数据{:?}", res, Vec::from(history_open_orders.clone()));
