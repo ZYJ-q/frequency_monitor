@@ -116,6 +116,7 @@ async fn real_time(
             if let Some(data) = binance_futures_api.get_open_orders(None).await {
                 let v: Value = serde_json::from_str(&data).unwrap();
                 let vec = v.as_array().unwrap();
+                trade_mapper::TradeMapper::delect_open_orders(name);
                 
                 println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
                 if vec.len() == 0 {
@@ -172,13 +173,9 @@ async fn real_time(
                         open_order_object.insert(String::from("executed_qty"), Value::from(executed_qty));
                         open_order_object.insert(String::from("reduce_only"), Value::from(reduce_only));
                         history_open_orders.push_back(Value::from(open_order_object));
-
-
-
-
                         // println!("11111{}", vec[a]);
                     }
-                    // trade_mapper::TradeMapper::delect_open_orders(name);
+                    
 
             let res = trade_mapper::TradeMapper::insert_open_orders(Vec::from(history_open_orders.clone()), name);
             println!("插入挂单数据是否成功{}, 数据{:?}", res, Vec::from(history_open_orders.clone()));

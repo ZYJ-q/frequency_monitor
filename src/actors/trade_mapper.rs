@@ -96,22 +96,22 @@ impl TradeMapper {
     
 
     if name == "Angus" {
-      value = r"INSERT OVERWRITE INTO open_trades (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      value = r"INSERT IGNORE INTO open_trades (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "trader02" {
-      value = r"INSERT OVERWRITE INTO open_trades_2 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      value = r"INSERT IGNORE INTO open_trades_2 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh01_feng4_virtual" {
-      value = r"INSERT OVERWRITE INTO open_trades_3 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      value = r"INSERT IGNORE INTO open_trades_3 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh02_b20230524_virtual" {
-      value = r"INSERT OVERWRITE INTO open_trades_4 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      value = r"INSERT IGNORE INTO open_trades_4 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh03_feng3_virtual" {
-      value = r"INSERT OVERWRITE INTO open_trades_5 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      value = r"INSERT IGNORE INTO open_trades_5 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh04_20230524_virtua" {
-      value = r"INSERT OVERWRITE INTO open_trades_6 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      value = r"INSERT IGNORE INTO open_trades_6 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     }
 
