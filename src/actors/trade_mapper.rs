@@ -59,25 +59,60 @@ impl TradeMapper {
     }
   }
   
+  pub fn delect_open_orders(name: &str){
+    let mut coon = get_connect();
+    let mut value = "";
+
+    if name == "Angus" {
+      value = r"truncate table open_trades";
+    } else if name == "trader02" {
+      value = r"truncate table open_trades_2";
+    } else if name == "xh01_feng4_virtual" {
+      value = r"truncate table open_trades_3";
+    } else if name == "xh02_b20230524_virtual" {
+      value = r"truncate table open_trades_4";
+    } else if name == "xh03_feng3_virtual" {
+      value =r"truncate table open_trades_5";
+    } else if name == "xh04_20230524_virtua" {
+      value = r"truncate table open_trades_6";
+    }
+
+    let open_order = coon.prep(
+      value
+    ).unwrap();
+
+    println!("open_order{:?}", open_order)
+
+
+    
+  }
 
 
   pub fn insert_open_orders(open_orders: Vec<Value>, name: &str) -> bool {
     let mut coon = get_connect();
     let mut value = "";
+
+
     
 
     if name == "Angus" {
-      value = r"UPDATE open_trades SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"INSERT IGNORE INTO open_trades (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "trader02" {
-      value = r"UPDATE open_trades_2 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"INSERT IGNORE INTO open_trades_2 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh01_feng4_virtual" {
-      value = r"UPDATE open_trades_3 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"INSERT IGNORE INTO open_trades_3 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh02_b20230524_virtual" {
-      value = r"UPDATE open_trades_4 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"INSERT IGNORE INTO open_trades_4 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh03_feng3_virtual" {
-      value = r"UPDATE open_trades_5 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"INSERT IGNORE INTO open_trades_5 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     } else if name == "xh04_20230524_virtua" {
-      value = r"UPDATE open_trades_6 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"INSERT IGNORE INTO open_trades_6 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
+      VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     }
 
     let open_order = coon.exec_batch(
