@@ -125,6 +125,7 @@ async fn real_time(
                         wx_robot.send_text(&sender, &content).await;
                     }
                     i += 1;
+                    continue;
     
                 } else {
                     for a in vec {
