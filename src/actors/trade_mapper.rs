@@ -67,17 +67,17 @@ impl TradeMapper {
     
 
     if name == "Angus" {
-      value = r"UPDATE open_orders SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"UPDATE open_trades SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
     } else if name == "trader02" {
-      value = r"UPDATE open_orders_2 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"UPDATE open_trades_2 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
     } else if name == "xh01_feng4_virtual" {
-      value = r"UPDATE open_orders_3 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"UPDATE open_trades_3 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
     } else if name == "xh02_b20230524_virtual" {
-      value = r"UPDATE open_orders_4 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"UPDATE open_trades_4 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
     } else if name == "xh03_feng3_virtual" {
-      value = r"UPDATE open_orders_5 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"UPDATE open_trades_5 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
     } else if name == "xh04_20230524_virtua" {
-      value = r"UPDATE open_orders_6 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+      value = r"UPDATE open_trades_6 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
     }
 
     let open_order = coon.exec_batch(
