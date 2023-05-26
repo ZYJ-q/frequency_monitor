@@ -120,9 +120,9 @@ async fn real_time(
                 println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
                 if vec.len() == 0 {
                     if i != 0 {
-                        let sender = format!("{}账号", name);
-                        let content = format!("一分钟内没有新挂单");
-                        wx_robot.send_text(&sender, &content).await;
+                        // let sender = format!("{}账号", name);
+                        // let content = format!("一分钟内没有新挂单");
+                        // wx_robot.send_text(&sender, &content).await;
                     }
                     i += 1;
                     continue;
@@ -178,15 +178,16 @@ async fn real_time(
 
                         // println!("11111{}", vec[a]);
                     }
+                    trade_mapper::TradeMapper::delect_open_orders(name);
+
+            let res = trade_mapper::TradeMapper::insert_open_orders(Vec::from(history_open_orders.clone()), name);
+            println!("插入挂单数据是否成功{}, 数据{:?}", res, Vec::from(history_open_orders.clone()));
                 }
                 // net_worth = notional_total/ori_fund;
                 // net_worth_histories.push_back(Value::from(new_account_object));
             }
 
-            trade_mapper::TradeMapper::delect_open_orders(name);
-
-            let res = trade_mapper::TradeMapper::insert_open_orders(Vec::from(history_open_orders.clone()), name);
-            println!("插入挂单数据是否成功{}, 数据{:?}", res, Vec::from(history_open_orders.clone())); 
+             
         }
 
 
