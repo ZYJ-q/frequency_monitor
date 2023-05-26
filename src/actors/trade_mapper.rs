@@ -58,6 +58,57 @@ impl TradeMapper {
       }
     }
   }
+  
+
+
+  pub fn insert_open_orders(open_orders: Vec<Value>, name: &str) -> bool {
+    let mut coon = get_connect();
+    let mut value = "";
+    
+
+    if name == "Angus" {
+      value = r"UPDATE open_orders SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+    } else if name == "trader02" {
+      value = r"UPDATE open_orders_2 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+    } else if name == "xh01_feng4_virtual" {
+      value = r"UPDATE open_orders_3 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+    } else if name == "xh02_b20230524_virtual" {
+      value = r"UPDATE open_orders_4 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+    } else if name == "xh03_feng3_virtual" {
+      value = r"UPDATE open_orders_5 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+    } else if name == "xh04_20230524_virtua" {
+      value = r"UPDATE open_orders_6 SET time=:time, name=:name, symbol=:symbol, type=:type, side=:side, price=:price, orig_qty=:orig_qty, executed_qty=:executed_qty, reduce_only=:reduce_only";
+    }
+
+    let open_order = coon.exec_batch(
+      value
+      ,
+      open_orders.iter().map(|p| params! {
+        "time" => &p["time"],
+        "name" => &p["name"],
+        "symbol" => &p["symbol"],
+        "type" => &p["type"],
+        "side" => &p["side"],
+        "price" => &p["price"],
+        "orig_qty" => &p["orig_qty"],
+        "executed_qty" => &p["executed_qty"],
+        "reduce_only" => &p["reduce_only"],
+      })
+    );
+
+    match open_order {
+      Ok(_c) => {
+        println!("insert position success");
+        return true;
+      },
+      Err(e) => {
+        eprintln!("error:{}", e);
+        return false;
+      }
+    }
+  }
+
+
 }
 
 impl PositionMapper {

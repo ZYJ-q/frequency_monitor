@@ -1,5 +1,7 @@
 
+use std::collections::VecDeque;
 use std::{collections::HashMap, fs, time::Duration};
+use chrono::{DateTime, Utc, NaiveDateTime};
 use log::{info, warn};
 use serde_json::{Map, Value};
 // use tokio::{sync::broadcast::{self, Receiver}};
@@ -90,6 +92,8 @@ async fn real_time(
         print!("running的值是否被改变{}", running);
 
         for f_config in binance {
+            let mut history_open_orders: VecDeque<Value> = VecDeque::new();
+            
             let binance_config = f_config.as_object().unwrap();
             let binance_futures_api=BinanceFuturesApi::new(
                 binance_config
@@ -112,6 +116,7 @@ async fn real_time(
             if let Some(data) = binance_futures_api.get_open_orders(None).await {
                 let v: Value = serde_json::from_str(&data).unwrap();
                 let vec = v.as_array().unwrap();
+                
                 println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
                 if vec.len() == 0 {
                     if i != 0 {
@@ -122,13 +127,63 @@ async fn real_time(
                     i += 1;
     
                 } else {
-                    for a in 0..vec.len() {
-                        println!("11111{}", vec[a]);
+                    for a in vec {
+                        let obj = a.as_object().unwrap();
+                        let mut open_order_object: Map<String, Value> = Map::new();
+                        let millis = obj.get("time").unwrap().as_i64().unwrap();
+                        let datetime: DateTime<Utc> = DateTime::from_utc(
+                            NaiveDateTime::from_timestamp_millis(millis).unwrap(),
+                            Utc,
+                        );
+                        // info!("datetime: {}", datetime);
+                        let time = format!("{}", datetime.format("%Y-%m-%d %H:%M:%S"));
+                        
+                        let symbol = obj.get("symbol").unwrap().as_str().unwrap();
+                        let r#type = obj.get("type").unwrap().as_str().unwrap();
+                        let mut type_value = "";
+                        if r#type == "LIMIT" {
+                            type_value = "限价单"
+                        } else if r#type == "MARKET" {
+                            type_value = "市价单"
+                        } else if r#type == "STOP" {
+                            type_value = "止损限价单"
+                        } else if r#type == "STOP_MARKET" {
+                            type_value = "止盈市价单"
+                        } else if r#type == "TAKE_PROFIT" {
+                            type_value = "止盈限价单"
+                        } else if r#type == "TAKE_PROFIT_MARKET" {
+                            type_value = "止盈市价单"
+                        } else if r#type == "TRAILING_STOP_MARKET" {
+                            type_value = "跟踪止损单" 
+                        }
+                        let side = obj.get("side").unwrap().as_str().unwrap();
+                        let price = obj.get("price").unwrap().as_str().unwrap();
+                        let orig_qty = obj.get("origQty").unwrap().as_str().unwrap();
+                        let executed_qty = obj.get("executedQty").unwrap().as_str().unwrap();
+                        let reduce_only = obj.get("reduceOnly").unwrap().as_bool().unwrap();
+                        open_order_object.insert(String::from("time"), Value::from(time.clone()));
+                        open_order_object.insert(String::from("name"), Value::from(name));
+                        open_order_object.insert(String::from("symbol"), Value::from(symbol));
+                        open_order_object.insert(String::from("type"), Value::from(type_value));
+                        open_order_object.insert(String::from("side"), Value::from(side));
+                        open_order_object.insert(String::from("price"), Value::from(price));
+                        open_order_object.insert(String::from("orig_qty"), Value::from(orig_qty));
+                        open_order_object.insert(String::from("executed_qty"), Value::from(executed_qty));
+                        open_order_object.insert(String::from("reduce_only"), Value::from(reduce_only));
+                        history_open_orders.push_back(Value::from(open_order_object));
+
+
+
+
+                        // println!("11111{}", vec[a]);
                     }
                 }
                 // net_worth = notional_total/ori_fund;
                 // net_worth_histories.push_back(Value::from(new_account_object));
             }
+
+            let res = trade_mapper::TradeMapper::insert_open_orders(Vec::from(history_open_orders.clone()), name);
+            println!("插入挂单数据是否成功{},", res); 
         }
 
 
