@@ -122,7 +122,6 @@ async fn real_time(
                         let content = format!("一分钟内没有新挂单");
                         wx_robot.send_text(&sender, &content).await;
                     }
-                    i += 1;
                     continue;
     
                 } else {
@@ -134,6 +133,7 @@ async fn real_time(
 
              
         }
+        i += 1;
 
 
         
