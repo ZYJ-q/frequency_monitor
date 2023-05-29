@@ -1,14 +1,13 @@
 
-use std::collections::VecDeque;
+// use std::collections::VecDeque;
 use std::{collections::HashMap, fs, time::Duration};
-use chrono::{DateTime, Utc, NaiveDateTime};
 use log::{info, warn};
 use serde_json::{Map, Value};
 // use tokio::{sync::broadcast::{self, Receiver}};
-use test_alarm::adapters::binance::futures::http::actions::BinanceFuturesApi;
-use test_alarm::base::ssh::SshClient;
-use test_alarm::base::wxbot::WxbotHttpClient;
-use test_alarm::actors::*;
+use open_order_alarm::adapters::binance::futures::http::actions::BinanceFuturesApi;
+// use open_order_alarm::base::ssh::SshClient;
+use open_order_alarm::base::wxbot::WxbotHttpClient;
+use open_order_alarm::actors::*;
 // use test_alarm::models::http_data::*;
 
 #[warn(unused_mut, unused_variables, dead_code)]
@@ -92,7 +91,6 @@ async fn real_time(
         print!("running的值是否被改变{}", running);
 
         for f_config in binance {
-            let mut history_open_orders: VecDeque<Value> = VecDeque::new();
             
             let binance_config = f_config.as_object().unwrap();
             let binance_futures_api=BinanceFuturesApi::new(
@@ -116,69 +114,19 @@ async fn real_time(
             if let Some(data) = binance_futures_api.get_open_orders(None).await {
                 let v: Value = serde_json::from_str(&data).unwrap();
                 let vec = v.as_array().unwrap();
-                trade_mapper::TradeMapper::delect_open_orders(name);
                 
                 println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
                 if vec.len() == 0 {
                     if i != 0 {
-                        // let sender = format!("{}账号", name);
-                        // let content = format!("一分钟内没有新挂单");
-                        // wx_robot.send_text(&sender, &content).await;
+                        let sender = format!("{}账号", name);
+                        let content = format!("一分钟内没有新挂单");
+                        wx_robot.send_text(&sender, &content).await;
                     }
                     i += 1;
                     continue;
     
                 } else {
-                    for a in vec {
-                        let obj = a.as_object().unwrap();
-                        let mut open_order_object: Map<String, Value> = Map::new();
-                        let millis = obj.get("time").unwrap().as_i64().unwrap();
-                        let datetime: DateTime<Utc> = DateTime::from_utc(
-                            NaiveDateTime::from_timestamp_millis(millis).unwrap(),
-                            Utc,
-                        );
-                        // info!("datetime: {}", datetime);
-                        let time = format!("{}", datetime.format("%Y-%m-%d %H:%M:%S"));
-                        
-                        let symbol = obj.get("symbol").unwrap().as_str().unwrap();
-                        let r#type = obj.get("type").unwrap().as_str().unwrap();
-                        let mut type_value = "";
-                        if r#type == "LIMIT" {
-                            type_value = "限价单"
-                        } else if r#type == "MARKET" {
-                            type_value = "市价单"
-                        } else if r#type == "STOP" {
-                            type_value = "止损限价单"
-                        } else if r#type == "STOP_MARKET" {
-                            type_value = "止盈市价单"
-                        } else if r#type == "TAKE_PROFIT" {
-                            type_value = "止盈限价单"
-                        } else if r#type == "TAKE_PROFIT_MARKET" {
-                            type_value = "止盈市价单"
-                        } else if r#type == "TRAILING_STOP_MARKET" {
-                            type_value = "跟踪止损单" 
-                        }
-                        let side = obj.get("side").unwrap().as_str().unwrap();
-                        let price = obj.get("price").unwrap().as_str().unwrap();
-                        let orig_qty = obj.get("origQty").unwrap().as_str().unwrap();
-                        let executed_qty = obj.get("executedQty").unwrap().as_str().unwrap();
-                        let reduce_only = obj.get("reduceOnly").unwrap().as_bool().unwrap();
-                        open_order_object.insert(String::from("time"), Value::from(time.clone()));
-                        open_order_object.insert(String::from("name"), Value::from(name));
-                        open_order_object.insert(String::from("symbol"), Value::from(symbol));
-                        open_order_object.insert(String::from("type"), Value::from(type_value));
-                        open_order_object.insert(String::from("side"), Value::from(side));
-                        open_order_object.insert(String::from("price"), Value::from(price));
-                        open_order_object.insert(String::from("orig_qty"), Value::from(orig_qty));
-                        open_order_object.insert(String::from("executed_qty"), Value::from(executed_qty));
-                        open_order_object.insert(String::from("reduce_only"), Value::from(reduce_only));
-                        history_open_orders.push_back(Value::from(open_order_object));
-                        // println!("11111{}", vec[a]);
-                    }
-                    
-
-            let res = trade_mapper::TradeMapper::insert_open_orders(Vec::from(history_open_orders.clone()), name);
-            println!("插入挂单数据是否成功{}, 数据{:?}", res, Vec::from(history_open_orders.clone()));
+                  println!("当前有挂单{}", vec.len());
                 }
                 // net_worth = notional_total/ori_fund;
                 // net_worth_histories.push_back(Value::from(new_account_object));
@@ -228,7 +176,7 @@ async fn main() {
         // let mut servers_config = Map::new();
         let binance_config = config.get("Binance").unwrap();
         let binance_future_config = binance_config.get("futures").unwrap().as_array().unwrap();
-        let server_config = config.get("Server").unwrap();
+        // let server_config = config.get("Server").unwrap();
         let symbols = config.get("Symbols").unwrap().as_array().unwrap();
         let key = config.get("Alarm").unwrap().get("webhook").unwrap().as_str().unwrap();
         // info!("获取key");
@@ -256,14 +204,14 @@ async fn main() {
         
         
         
-        let ssh_api = SshClient::new(
-            server_config.get("host").unwrap().as_str().unwrap(),
-            server_config.get("port").unwrap().as_str().unwrap(),
-            server_config.get("username").unwrap().as_str().unwrap(),
-            server_config.get("password").unwrap().as_str().unwrap(),
-            server_config.get("root_path").unwrap().as_str().unwrap(),
-            server_config.get("root_name").unwrap().as_str().unwrap(),
-        );
+        // let ssh_api = SshClient::new(
+        //     server_config.get("host").unwrap().as_str().unwrap(),
+        //     server_config.get("port").unwrap().as_str().unwrap(),
+        //     server_config.get("username").unwrap().as_str().unwrap(),
+        //     server_config.get("password").unwrap().as_str().unwrap(),
+        //     server_config.get("root_path").unwrap().as_str().unwrap(),
+        //     server_config.get("root_name").unwrap().as_str().unwrap(),
+        // );
         
 
         
