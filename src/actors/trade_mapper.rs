@@ -110,7 +110,7 @@ impl TradeMapper {
     } else if name == "xh03_feng3_virtual" {
       value = r"INSERT IGNORE INTO open_trades_5 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
-    } else if name == "xh04_20230524_virtua" {
+    } else if name == "xh04_20230524_virtual" {
       value = r"INSERT IGNORE INTO open_trades_6 (time, name, symbol, type, side, price, orig_qty, executed_qty, reduce_only)
       VALUES (:time,:name, :symbol, :type, :side, :price, :orig_qty, :executed_qty, :reduce_only)";
     }
