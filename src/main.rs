@@ -86,31 +86,20 @@ async fn real_time(
         //     }
         // }
         // map.insert(String::from("server"), Value::from(server_process));
+        
+        let res = trade_mapper::TradeMapper::get_positions();
+       
+        if let Ok(a) = res{
 
-
-        print!("running的值是否被改变{}", running);
-
-        for f_config in binance {
+        for f_config in a {
             
-            let binance_config = f_config.as_object().unwrap();
+            // let binance_config = f_config.as_object().unwrap();
             let binance_futures_api=BinanceFuturesApi::new(
-                binance_config
-                    .get("base_url")
-                    .unwrap()
-                    .as_str()
-                    .unwrap(),
-                binance_config
-                    .get("api_key")
-                    .unwrap()
-                    .as_str()
-                    .unwrap(),
-                binance_config
-                    .get("secret_key")
-                    .unwrap()
-                    .as_str()
-                    .unwrap(),
+                "https://fapi.binance.com",
+                &f_config.api_key,
+                &f_config.secret_key,
             );
-            let name = binance_config.get("name").unwrap().as_str().unwrap();
+            let name = f_config.name;
             if let Some(data) = binance_futures_api.get_open_orders(None).await {
                 let v: Value = serde_json::from_str(&data).unwrap();
                 let vec = v.as_array().unwrap();
@@ -133,6 +122,7 @@ async fn real_time(
 
              
         }
+    }
         i += 1;
 
 

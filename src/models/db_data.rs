@@ -15,6 +15,14 @@ pub struct AccProd {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct Positions {
+    pub id: u64,
+    pub api_key: String,
+    pub secret_key: String,
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Product {
     pub prod_id: u64,
     pub prod_name: String,

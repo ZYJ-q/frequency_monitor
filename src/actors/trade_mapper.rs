@@ -8,10 +8,26 @@ use crate::actors::database::get_connect;
 use mysql::*;
 use mysql::prelude::*;
 use serde_json::Value;
-// use super::db_data::Trade;
+use super::db_data::Positions;
 
 
 impl TradeMapper {
+
+
+
+  pub fn get_positions() -> Result<Vec<Positions>> {
+    // 连接数据库
+    let mut conn = get_connect();
+    let res = conn.query_map(
+      r"select * from open_orders",
+      |(id, api_key, secret_key, name)| {
+        Positions{ id, api_key, secret_key, name}
+      } 
+    ).unwrap();
+    return Ok(res);
+  }
+
+
   // 插入数据
   pub fn insert_trade(trades:Vec<Value>) -> bool {
     // 连接数据库
