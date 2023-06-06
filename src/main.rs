@@ -120,10 +120,15 @@ async fn real_time(
                 // net_worth_histories.push_back(Value::from(new_account_object));
             }
 
+
+            
+
              
         }
-    }
+
         i += 1;
+    }
+        
 
 
         
