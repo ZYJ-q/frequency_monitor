@@ -20,8 +20,8 @@ impl TradeMapper {
     let mut conn = get_connect();
     let res = conn.query_map(
       r"select * from open_orders",
-      |(id, api_key, secret_key, name)| {
-        Positions{ id, api_key, secret_key, name}
+      |(tra_id, tra_venue, ori_balance, tra_currency, api_key, secret_key, other_keys, r#type, name, alarm, threshold)| {
+        Positions{ tra_id, tra_venue, ori_balance, tra_currency, api_key, secret_key, other_keys, r#type, name, alarm, threshold }
       } 
     ).unwrap();
     return Ok(res);

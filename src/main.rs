@@ -100,6 +100,8 @@ async fn real_time(
                 &f_config.secret_key,
             );
             let name = f_config.name;
+            let alarm = f_config.alarm;
+            if alarm == "true"{
             if let Some(data) = binance_futures_api.get_open_orders(None).await {
                 let v: Value = serde_json::from_str(&data).unwrap();
                 let vec = v.as_array().unwrap();
@@ -119,6 +121,7 @@ async fn real_time(
                 // net_worth = notional_total/ori_fund;
                 // net_worth_histories.push_back(Value::from(new_account_object));
             }
+        }
 
 
             
