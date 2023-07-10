@@ -5,6 +5,7 @@ use log::{info, warn};
 use serde_json::{Map, Value};
 // use tokio::{sync::broadcast::{self, Receiver}};
 use open_order_alarm::adapters::binance::futures::http::actions::BinanceFuturesApi;
+use open_order_alarm::adapters::bybit::futures::http::actions::ByBitFuturesApi;
 // use open_order_alarm::base::ssh::SshClient;
 use open_order_alarm::base::wxbot::WxbotHttpClient;
 use open_order_alarm::actors::*;
@@ -93,38 +94,101 @@ async fn real_time(
 
         for f_config in a {
 
-            println!("tra_venue{}, name{}", f_config.tra_venue, f_config.name);
+            // println!("tra_venue{}, name{}", f_config.tra_venue, f_config.name);
+
+            let tra_name = &f_config.name;
+            let tra_alarm = &f_config.alarm;
 
             
-            // let binance_config = f_config.as_object().unwrap();
-        //     let binance_futures_api=BinanceFuturesApi::new(
-        //         "https://fapi.binance.com",
-        //         &f_config.api_key,
-        //         &f_config.secret_key,
-        //     );
-        //     let name = f_config.name;
-        //     let alarm = f_config.alarm;
-        //     if alarm == "true"{
-        //     if let Some(data) = binance_futures_api.get_open_orders(None).await {
-        //         let v: Value = serde_json::from_str(&data).unwrap();
-        //         let vec = v.as_array().unwrap();
-                
-        //         println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
-        //         if vec.len() == 0 {
-        //             if i != 0 {
-        //                 let sender = format!("{}账号", name);
-        //                 let content = format!("一分钟内没有新挂单");
-        //                 wx_robot.send_text(&sender, &content).await;
-        //             }
-        //             continue;
-    
-        //         } else {
-        //           println!("当前有挂单{}", vec.len());
-        //         }
-        //         // net_worth = notional_total/ori_fund;
-        //         // net_worth_histories.push_back(Value::from(new_account_object));
-        //     }
-        // }
+            if f_config.tra_currency == "Binance"{
+                // let binance_config = f_config.as_object().unwrap();
+            let binance_futures_api=BinanceFuturesApi::new(
+                "https://fapi.binance.com",
+                &f_config.api_key,
+                &f_config.secret_key,
+            );
+            let name = tra_name;
+            let alarm = tra_alarm;
+            if name != "pca01"{
+                if alarm == "true"{
+                    if let Some(data) = binance_futures_api.get_open_orders(None).await {
+                        let v: Value = serde_json::from_str(&data).unwrap();
+                        let vec = v.as_array().unwrap();
+                        
+                        println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
+                        if vec.len() == 0 {
+                            if i != 0 {
+                                let sender = format!("{}账号", name);
+                                let content = format!("一分钟内没有新挂单");
+                                wx_robot.send_text(&sender, &content).await;
+                            }
+                            continue;
+            
+                        } else {
+                          println!("当前有挂单{}", vec.len());
+                        }
+                        // net_worth = notional_total/ori_fund;
+                        // net_worth_histories.push_back(Value::from(new_account_object));
+                    }
+                }
+            }
+        }
+
+        if f_config.tra_currency == "ByBit"{
+            // let bybit_config = f_config.as_object().unwrap();
+        let bybit_futures_api=ByBitFuturesApi::new(
+            "https://api.bybit.com",
+            &f_config.api_key,
+            &f_config.secret_key,
+        );
+        let name = tra_name;
+        let alarm = tra_alarm;
+        let category = "spot";
+        let category_linear = "linear";
+            if alarm == "true"{
+                if let Some(data) = bybit_futures_api.get_bybit_open_orders(category).await {
+                    let v: Value = serde_json::from_str(&data).unwrap();
+                    let result = v.as_object().unwrap().get("result").unwrap().as_object().unwrap();
+                    let vec = result.get("list").unwrap().as_array().unwrap();
+                    
+                    println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
+                    if vec.len() == 0 {
+                        if i != 0 {
+                            let sender = format!("{}现货账号", name);
+                            let content = format!("一分钟内没有新挂单");
+                            wx_robot.send_text(&sender, &content).await;
+                        }
+                        continue;
+        
+                    } else {
+                      println!("当前有挂单{}", vec.len());
+                    }
+                    // net_worth = notional_total/ori_fund;
+                    // net_worth_histories.push_back(Value::from(new_account_object));
+                }
+
+                if let Some(data) = bybit_futures_api.get_bybit_open_orders(category_linear).await {
+                    let v: Value = serde_json::from_str(&data).unwrap();
+                    let result = v.as_object().unwrap().get("result").unwrap().as_object().unwrap();
+                    let vec = result.get("list").unwrap().as_array().unwrap();
+                    
+                    println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
+                    if vec.len() == 0 {
+                        if i != 0 {
+                            let sender = format!("{}期货账号", name);
+                            let content = format!("一分钟内没有新挂单");
+                            wx_robot.send_text(&sender, &content).await;
+                        }
+                        continue;
+        
+                    } else {
+                      println!("当前有挂单{}", vec.len());
+                    }
+                    // net_worth = notional_total/ori_fund;
+                    // net_worth_histories.push_back(Value::from(new_account_object));
+                }
+        }
+    }
 
 
             
