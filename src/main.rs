@@ -174,7 +174,7 @@ async fn real_time(
                     let result = v.as_object().unwrap().get("result").unwrap().as_object().unwrap();
                     let vec = result.get("list").unwrap().as_array().unwrap();
                     
-                    println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
+                    println!("名字{}", name);
                     if vec.len() == 0 {
                         if i != 0 {
                             let sender = format!("{}期货账号", name);
