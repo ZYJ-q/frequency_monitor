@@ -92,36 +92,39 @@ async fn real_time(
         if let Ok(a) = res{
 
         for f_config in a {
+
+            println!("tra_venue{}, name{}", f_config.tra_venue, f_config.name);
+
             
             // let binance_config = f_config.as_object().unwrap();
-            let binance_futures_api=BinanceFuturesApi::new(
-                "https://fapi.binance.com",
-                &f_config.api_key,
-                &f_config.secret_key,
-            );
-            let name = f_config.name;
-            let alarm = f_config.alarm;
-            if alarm == "true"{
-            if let Some(data) = binance_futures_api.get_open_orders(None).await {
-                let v: Value = serde_json::from_str(&data).unwrap();
-                let vec = v.as_array().unwrap();
+        //     let binance_futures_api=BinanceFuturesApi::new(
+        //         "https://fapi.binance.com",
+        //         &f_config.api_key,
+        //         &f_config.secret_key,
+        //     );
+        //     let name = f_config.name;
+        //     let alarm = f_config.alarm;
+        //     if alarm == "true"{
+        //     if let Some(data) = binance_futures_api.get_open_orders(None).await {
+        //         let v: Value = serde_json::from_str(&data).unwrap();
+        //         let vec = v.as_array().unwrap();
                 
-                println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
-                if vec.len() == 0 {
-                    if i != 0 {
-                        let sender = format!("{}账号", name);
-                        let content = format!("一分钟内没有新挂单");
-                        wx_robot.send_text(&sender, &content).await;
-                    }
-                    continue;
+        //         println!("获取到的账户挂单信息:{:?}, 名字{}", vec, name);
+        //         if vec.len() == 0 {
+        //             if i != 0 {
+        //                 let sender = format!("{}账号", name);
+        //                 let content = format!("一分钟内没有新挂单");
+        //                 wx_robot.send_text(&sender, &content).await;
+        //             }
+        //             continue;
     
-                } else {
-                  println!("当前有挂单{}", vec.len());
-                }
-                // net_worth = notional_total/ori_fund;
-                // net_worth_histories.push_back(Value::from(new_account_object));
-            }
-        }
+        //         } else {
+        //           println!("当前有挂单{}", vec.len());
+        //         }
+        //         // net_worth = notional_total/ori_fund;
+        //         // net_worth_histories.push_back(Value::from(new_account_object));
+        //     }
+        // }
 
 
             
