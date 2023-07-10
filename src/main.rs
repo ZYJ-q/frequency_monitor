@@ -100,7 +100,8 @@ async fn real_time(
             let tra_alarm = &f_config.alarm;
 
             
-            if f_config.tra_currency == "Binance"{
+            if &f_config.tra_currency == "Binance"{
+                println!("等于Bianace{}", &f_config.tra_currency);
                 // let binance_config = f_config.as_object().unwrap();
             let binance_futures_api=BinanceFuturesApi::new(
                 "https://fapi.binance.com",
@@ -134,7 +135,8 @@ async fn real_time(
             }
         }
 
-        if f_config.tra_currency == "ByBit"{
+        if &f_config.tra_currency == "ByBit"{
+            println!("等于Bybit{}", &f_config.tra_currency);
             // let bybit_config = f_config.as_object().unwrap();
         let bybit_futures_api=ByBitFuturesApi::new(
             "https://api.bybit.com",
