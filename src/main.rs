@@ -100,8 +100,8 @@ async fn real_time(
             let tra_alarm = &f_config.alarm;
 
             
-            if &f_config.tra_currency.to_string() == "Binance"{
-                println!("等于Bianace{}", &f_config.tra_currency);
+            if &f_config.tra_venue == "Binance"{
+                println!("等于Bianace{}", &f_config.tra_venue);
                 // let binance_config = f_config.as_object().unwrap();
             let binance_futures_api=BinanceFuturesApi::new(
                 "https://fapi.binance.com",
@@ -110,8 +110,8 @@ async fn real_time(
             );
             let name = tra_name;
             let alarm = tra_alarm;
-            if name.to_string() != "pca01"{
-                if alarm.to_string() == "true"{
+            if name != "pca01"{
+                if alarm == "true"{
                     if let Some(data) = binance_futures_api.get_open_orders(None).await {
                         let v: Value = serde_json::from_str(&data).unwrap();
                         let vec = v.as_array().unwrap();
@@ -135,8 +135,8 @@ async fn real_time(
             }
         }
 
-        if &f_config.tra_currency.to_string() == "ByBit"{
-            println!("等于Bybit{}", &f_config.tra_currency);
+        if &f_config.tra_venue == "ByBit"{
+            println!("等于Bybit{}", &f_config.tra_venue);
             // let bybit_config = f_config.as_object().unwrap();
         let bybit_futures_api=ByBitFuturesApi::new(
             "https://api.bybit.com",
