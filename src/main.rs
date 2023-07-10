@@ -94,7 +94,7 @@ async fn real_time(
 
         for f_config in a {
 
-            // println!("tra_venue{}, name{}", f_config.tra_venue, f_config.name);
+            println!("tra_venue{}, name{}", &f_config.tra_venue, &f_config.name);
 
             let tra_name = &f_config.name;
             let tra_alarm = &f_config.alarm;
