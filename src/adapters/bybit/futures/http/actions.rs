@@ -81,4 +81,37 @@ impl ByBitFuturesApi {
         }
     }
 
+
+    pub async fn get_bybit_usdc_open_orders(&self) -> Option<String> {
+        // let my_currency = String::from(currency.unwrap_or("USDT"));
+
+        let mut params: HashMap<String, Value> = HashMap::new();
+        params.insert(
+            String::from("category"),
+            Value::from("spot"),
+        );
+        params.insert(
+            String::from("settleCoin"),
+             Value::from("USDC")
+        );
+
+        let response = self
+            .client
+            .send(Method::GET, "/v5/order/realtime", true,&mut params)
+            .await;
+
+        let res_data = self.client.check_response_data(response);
+
+        // println!("挂单数据{:?}", res_data);
+
+        match res_data {
+            Some(data) => {
+                return Some(data);
+            }
+            None => {
+                return None;
+            }
+        }
+    }
+
 }

@@ -148,25 +148,40 @@ async fn real_time(
         let category = "spot";
         let category_linear = "linear";
             if alarm == "true"{
+                let mut open_orders = 0;
                 if let Some(data) = bybit_futures_api.get_bybit_open_orders(category).await {
                     let v: Value = serde_json::from_str(&data).unwrap();
                     let result = v.as_object().unwrap().get("result").unwrap().as_object().unwrap();
                     let vec = result.get("list").unwrap().as_array().unwrap();
-                    
                     println!("名字{}",name);
-                    if vec.len() == 0 {
-                        if i != 0 {
-                            let sender = format!("{}现货账号", name);
-                            let content = format!("一分钟内没有新挂单");
-                            wx_robot.send_text(&sender, &content).await;
-                        }
-                        continue;
-        
-                    } else {
-                      println!("当前有挂单{}", vec.len());
-                    }
+                    open_orders += vec.len();
+                    println!("现货usdt挂单数量{:?}", vec.len());
                     // net_worth = notional_total/ori_fund;
                     // net_worth_histories.push_back(Value::from(new_account_object));
+                }
+
+                if let Some(data) = bybit_futures_api.get_bybit_usdc_open_orders().await {
+                    let v: Value = serde_json::from_str(&data).unwrap();
+                    let result = v.as_object().unwrap().get("result").unwrap().as_object().unwrap();
+                    let vec_usdc = result.get("list").unwrap().as_array().unwrap();
+                    
+                    open_orders += vec_usdc.len();
+                    println!("现货挂单数量{:?}", vec_usdc.len());
+                    // net_worth = notional_total/ori_fund;
+                    // net_worth_histories.push_back(Value::from(new_account_object));
+                }
+
+
+                if open_orders == 0 {
+                    if i != 0 {
+                        let sender = format!("{}现货账号", name);
+                        let content = format!("一分钟内没有新挂单");
+                        wx_robot.send_text(&sender, &content).await;
+                    }
+                    continue;
+    
+                } else {
+                  println!("当前有现货挂单{}", open_orders);
                 }
 
                 if let Some(data) = bybit_futures_api.get_bybit_open_orders(category_linear).await {
