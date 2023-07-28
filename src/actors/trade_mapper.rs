@@ -8,7 +8,7 @@ use crate::actors::database::get_connect;
 use mysql::*;
 use mysql::prelude::*;
 use serde_json::Value;
-use super::db_data::Positions;
+use super::db_data::{Positions, AccWeixin};
 
 
 impl TradeMapper {
@@ -19,9 +19,23 @@ impl TradeMapper {
     // 连接数据库
     let mut conn = get_connect();
     let res = conn.query_map(
-      r"select * from test_traders",
-      |(tra_id, tra_venue, ori_balance, tra_currency, api_key, secret_key, other_keys, r#type, name, alarm, threshold)| {
-        Positions{ tra_id, tra_venue, ori_balance, tra_currency, api_key, secret_key, other_keys, r#type, name, alarm, threshold }
+      r"select * from traders",
+      |(tra_id, tra_venue,  tra_currency, api_key, secret_key, r#type, name, alarm, threshold, borrow, amount, wx_hook)| {
+        Positions{ tra_id, tra_venue,  tra_currency, api_key, secret_key, r#type, name, alarm, threshold, borrow, amount, wx_hook }
+      } 
+    ).unwrap();
+    return Ok(res);
+  }
+
+
+
+  pub fn get_weixin() -> Result<Vec<AccWeixin>> {
+    // 连接数据库
+    let mut conn = get_connect();
+    let res = conn.query_map(
+      r"select * from weixins",
+      |( wx_id, wx_name, wx_hook)| {
+        AccWeixin{ wx_id, wx_name, wx_hook }
       } 
     ).unwrap();
     return Ok(res);

@@ -89,6 +89,7 @@ async fn real_time(
         // map.insert(String::from("server"), Value::from(server_process));
         
         let res = trade_mapper::TradeMapper::get_positions();
+        let weixin = trade_mapper::TradeMapper::get_weixin().unwrap();
        
         if let Ok(a) = res{
 
@@ -100,7 +101,7 @@ async fn real_time(
             let tra_alarm = &f_config.alarm;
 
             
-            if &f_config.tra_venue == "Binance"{
+            if &f_config.tra_venue == "Binance" && &f_config.r#type == "Futures"{
                 println!("等于Bianace{}", &f_config.tra_venue);
                 // let binance_config = f_config.as_object().unwrap();
             let binance_futures_api=BinanceFuturesApi::new(
@@ -110,28 +111,43 @@ async fn real_time(
             );
             let name = tra_name;
             let alarm = tra_alarm;
+            let wx_hook = &f_config.wx_hook;
             if name != "pca01"{
-                if alarm == "true"{
-                    if let Some(data) = binance_futures_api.get_open_orders(None).await {
-                        let v: Value = serde_json::from_str(&data).unwrap();
-                        let vec = v.as_array().unwrap();
-                        
-                        println!(" 名字{}",  name);
-                        if vec.len() == 0 {
-                            if i != 0 {
-                                let sender = format!("{}账号", name);
-                                let content = format!("一分钟内没有新挂单");
-                                wx_robot.send_text(&sender, &content).await;
-                            }
-                            continue;
-            
-                        } else {
-                          println!("当前有挂单{}", vec.len());
-                        }
-                        // net_worth = notional_total/ori_fund;
-                        // net_worth_histories.push_back(Value::from(new_account_object));
+                for f_weixin in &weixin {
+                    let new_wx_hook = &f_weixin.wx_hook;
+                    if new_wx_hook == wx_hook {
+                        let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+        wxbot.push_str(new_wx_hook);
+        info!("wxbot  {}", wxbot);
+        let wx_robot = WxbotHttpClient::new(&wxbot);
+
+        if alarm == "true"{
+            if let Some(data) = binance_futures_api.get_open_orders(None).await {
+                let v: Value = serde_json::from_str(&data).unwrap();
+                let vec = v.as_array().unwrap();
+                
+                println!(" 名字{}",  name);
+                if vec.len() == 0 {
+                    if i != 0 {
+                        let sender = format!("{}账号", name);
+                        let content = format!("一分钟内没有新挂单");
+                        wx_robot.send_text(&sender, &content).await;
+                    }
+                    continue;
+    
+                } else {
+                  println!("当前有挂单{}", vec.len());
+                }
+                // net_worth = notional_total/ori_fund;
+                // net_worth_histories.push_back(Value::from(new_account_object));
+            }
+        }
+
+
                     }
                 }
+
+                
             }
         }
 
@@ -145,6 +161,7 @@ async fn real_time(
         );
         let name = tra_name;
         let alarm = tra_alarm;
+        let wx_hook = &f_config.wx_hook;
         let category = "spot";
         let category_linear = "linear";
             if alarm == "true"{
@@ -172,12 +189,27 @@ async fn real_time(
                 }
 
 
+                
+
+                
+
+
                 if open_orders == 0 {
-                    if i != 0 {
-                        let sender = format!("{}现货账号", name);
-                        let content = format!("一分钟内没有新挂单");
-                        wx_robot.send_text(&sender, &content).await;
+                    for f_weixin in &weixin {
+                        let new_wx_hook = &f_weixin.wx_hook;
+                        if new_wx_hook == wx_hook {
+                            let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+            wxbot.push_str(new_wx_hook);
+            info!("wxbot  {}", wxbot);
+            let wx_robot = WxbotHttpClient::new(&wxbot);
+            if i != 0 {
+                let sender = format!("{}现货账号", name);
+                let content = format!("一分钟内没有新挂单");
+                wx_robot.send_text(&sender, &content).await;
+            }
+                        }
                     }
+                    
                     continue;
     
                 } else {
@@ -192,9 +224,19 @@ async fn real_time(
                     println!("名字{}", name);
                     if vec.len() == 0 {
                         if i != 0 {
-                            let sender = format!("{}期货账号", name);
+                            for f_weixin in &weixin {
+                                let new_wx_hook = &f_weixin.wx_hook;
+                                if new_wx_hook == wx_hook {
+                                    let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+                    wxbot.push_str(new_wx_hook);
+                    info!("wxbot  {}", wxbot);
+                    let wx_robot = WxbotHttpClient::new(&wxbot);
+                    let sender = format!("{}期货账号", name);
                             let content = format!("一分钟内没有新挂单");
                             wx_robot.send_text(&sender, &content).await;
+                                }
+                            }
+                            
                         }
                         continue;
         
@@ -260,8 +302,12 @@ async fn main() {
         let binance_future_config = binance_config.get("futures").unwrap().as_array().unwrap();
         // let server_config = config.get("Server").unwrap();
         let symbols = config.get("Symbols").unwrap().as_array().unwrap();
+
         let key = config.get("Alarm").unwrap().get("webhook").unwrap().as_str().unwrap();
         // info!("获取key");
+        let res = trade_mapper::TradeMapper::get_weixin().unwrap();
+
+
         let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
         wxbot.push_str(key);
         info!("wxbot  {}", wxbot);
