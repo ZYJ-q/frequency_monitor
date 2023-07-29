@@ -19,7 +19,7 @@ impl TradeMapper {
     // 连接数据库
     let mut conn = get_connect();
     let res = conn.query_map(
-      r"select * from traders",
+      r"select * from test_traders",
       |(tra_id, tra_venue,  tra_currency, api_key, secret_key, r#type, name, alarm, threshold, borrow, amount, wx_hook)| {
         Positions{ tra_id, tra_venue,  tra_currency, api_key, secret_key, r#type, name, alarm, threshold, borrow, amount, wx_hook }
       } 
