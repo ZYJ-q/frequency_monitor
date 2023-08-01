@@ -5,6 +5,7 @@ use log::{info, warn};
 use serde_json::{Map, Value};
 // use tokio::{sync::broadcast::{self, Receiver}};
 use open_order_alarm::adapters::binance::futures::http::actions::BinanceFuturesApi;
+use open_order_alarm::adapters::binance::papi::http::actions::BinancePapiApi;
 use open_order_alarm::adapters::bybit::futures::http::actions::ByBitFuturesApi;
 // use open_order_alarm::base::ssh::SshClient;
 use open_order_alarm::base::wxbot::WxbotHttpClient;
@@ -249,6 +250,56 @@ async fn real_time(
         }
     }
 
+
+
+         
+    if &f_config.tra_venue == "Binance" && &f_config.r#type == "Papi"{
+        println!("等于Bianace{}", &f_config.tra_venue);
+        // let binance_config = f_config.as_object().unwrap();
+    let binance_papi_api=BinancePapiApi::new(
+        "https://papi.binance.com",
+        &f_config.api_key,
+        &f_config.secret_key,
+    );
+    let name = tra_name;
+    let alarm = tra_alarm;
+    let wx_hook = &f_config.wx_hook;
+        for f_weixin in &weixin {
+            let new_wx_hook = &f_weixin.wx_hook;
+            if new_wx_hook == wx_hook {
+                let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+wxbot.push_str(new_wx_hook);
+info!("wxbot  {}", wxbot);
+let wx_robot = WxbotHttpClient::new(&wxbot);
+
+if alarm == "true"{
+    if let Some(data) = binance_papi_api.get_open_orders(None).await {
+        let v: Value = serde_json::from_str(&data).unwrap();
+        let vec = v.as_array().unwrap();
+        
+        println!(" 名字{}",  name);
+        if vec.len() == 0 {
+            if i != 0 {
+                let sender = format!("{}账号", name);
+                let content = format!("一分钟内没有新挂单");
+                wx_robot.send_text(&sender, &content).await;
+            }
+            continue;
+
+        } else {
+          println!("当前有挂单{}", vec.len());
+        }
+        // net_worth = notional_total/ori_fund;
+        // net_worth_histories.push_back(Value::from(new_account_object));
+    }
+}
+
+
+            }
+        }
+
+        
+}
 
             
 
