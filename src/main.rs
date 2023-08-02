@@ -130,7 +130,7 @@ async fn real_time(
                 println!(" 名字{}",  name);
                 if vec.len() == 0 {
                     if i != 0 {
-                        let sender = format!("{}账号", name);
+                        let sender = format!("Binance交易所的----{}普通账号", name);
                         let content = format!("一分钟内没有新挂单");
                         wx_robot.send_text(&sender, &content).await;
                     }
@@ -204,7 +204,7 @@ async fn real_time(
             info!("wxbot  {}", wxbot);
             let wx_robot = WxbotHttpClient::new(&wxbot);
             if i != 0 {
-                let sender = format!("{}现货账号", name);
+                let sender = format!("ByBit交易所的----{}现货账号", name);
                 let content = format!("一分钟内没有新挂单");
                 wx_robot.send_text(&sender, &content).await;
             }
@@ -232,7 +232,7 @@ async fn real_time(
                     wxbot.push_str(new_wx_hook);
                     info!("wxbot  {}", wxbot);
                     let wx_robot = WxbotHttpClient::new(&wxbot);
-                    let sender = format!("{}期货账号", name);
+                    let sender = format!("ByBit交易所的----{}期货账号", name);
                             let content = format!("一分钟内没有新挂单");
                             wx_robot.send_text(&sender, &content).await;
                                 }
@@ -280,7 +280,7 @@ if alarm == "true"{
         println!(" 名字{}",  name);
         if vec.len() == 0 {
             if i != 0 {
-                let sender = format!("{}账号", name);
+                let sender = format!("Binance交易所的----{}统一账号", name);
                 let content = format!("一分钟内没有新挂单");
                 wx_robot.send_text(&sender, &content).await;
             }
