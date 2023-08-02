@@ -107,7 +107,7 @@ async fn real_time(
                 println!("等于Bianace{}", &f_config.tra_venue);
                 // let binance_config = f_config.as_object().unwrap();
 
-                let slackrobot = String::from("https://hooks.slack.com/services/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");
+                let slackrobot = String::from("https://hooks.slack.com/services/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");
                 let slack_robot = SlackHttpClient::new(&slackrobot);
                 slack_robot.send_text("这是一个测试消息", "一分钟内没有挂单").await;
 
