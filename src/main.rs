@@ -106,12 +106,12 @@ async fn real_time(
             if &f_config.tra_venue == "Binance" && &f_config.r#type == "Futures"{
                 println!("等于Bianace{}", &f_config.tra_venue);
                 // let binance_config = f_config.as_object().unwrap();
-                let key = "6vLVAQ2j53HvBoEeFfFDPUqe";
+                // let key = "6vLVAQ2j53HvBoEeFfFDPUqe";
 
-                let mut slackrobot = String::from("https://hooks.slack.com/services/T0233U2HAHF/B05L8PDQM09/");
-                slackrobot.push_str(key);
-                let slack_robot = SlackHttpClient::new(&slackrobot);
-                slack_robot.send_text("这是一个测试消息", "一分钟内没有挂单").await;
+                // let mut slackrobot = String::from("https://hooks.slack.com/services/T0233U2HAHF/B05L8PDQM09/");
+                // slackrobot.push_str(key);
+                // let slack_robot = SlackHttpClient::new(&slackrobot);
+                // slack_robot.send_text("这是一个测试消息", "一分钟内没有挂单").await;
 
             let binance_futures_api=BinanceFuturesApi::new(
                 "https://fapi.binance.com",
