@@ -101,6 +101,7 @@ async fn real_time(
 
             let tra_name = &f_config.name;
             let tra_alarm = &f_config.alarm;
+            let new_tra_id = &f_config.tra_id;
 
             
             if &f_config.tra_venue == "Binance" && &f_config.r#type == "Futures"{
@@ -120,13 +121,16 @@ async fn real_time(
             );
             let name = tra_name;
             let alarm = tra_alarm;
-            let wx_hook = &f_config.wx_hook;
             if name != "pca01"{
                 for f_weixin in &weixin {
-                    let new_wx_hook = &f_weixin.wx_hook;
-                    if new_wx_hook == wx_hook {
-                        let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
-        wxbot.push_str(new_wx_hook);
+                    let tra_id = &f_weixin.tra_id;
+                    let wx_hook = &f_weixin.wx_hook;
+                    let slack_hook = &f_weixin.slack_hook;
+                    let mess_hok = &f_weixin.mess_hook;
+                    if new_tra_id == tra_id {
+                        if wx_hook.len() != 0 {
+                            let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+        wxbot.push_str(&wx_hook);
         info!("wxbot  {}", wxbot);
         let wx_robot = WxbotHttpClient::new(&wxbot);
 
@@ -152,6 +156,39 @@ async fn real_time(
             }
         }
 
+                        }
+
+                        if slack_hook.len() != 0 {
+                            let mut slackrobot = String::from("https://hooks.slack.com/services/");
+                slackrobot.push_str(&slack_hook);
+                let slack_robot = SlackHttpClient::new(&slackrobot);
+
+
+                if alarm == "true"{
+                    if let Some(data) = binance_futures_api.get_open_orders(None).await {
+                        let v: Value = serde_json::from_str(&data).unwrap();
+                        let vec = v.as_array().unwrap();
+                        
+                        println!(" 名字{}",  name);
+                        if vec.len() == 0 {
+                            if i != 0 {
+                                let sender = format!("Binance交易所的----{}普通账号", name);
+                                let content = format!("一分钟内没有新挂单");
+                                slack_robot.send_text(&sender, &content).await;
+                            }
+                            continue;
+            
+                        } else {
+                          println!("当前有挂单{}", vec.len());
+                        }
+                        // net_worth = notional_total/ori_fund;
+                        // net_worth_histories.push_back(Value::from(new_account_object));
+                    }
+                }
+
+                        }
+                        
+
 
                     }
                 }
@@ -170,7 +207,6 @@ async fn real_time(
         );
         let name = tra_name;
         let alarm = tra_alarm;
-        let wx_hook = &f_config.wx_hook;
         let category = "spot";
         let category_linear = "linear";
             if alarm == "true"{
@@ -205,17 +241,49 @@ async fn real_time(
 
                 if open_orders == 0 {
                     for f_weixin in &weixin {
-                        let new_wx_hook = &f_weixin.wx_hook;
-                        if new_wx_hook == wx_hook {
-                            let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
-            wxbot.push_str(new_wx_hook);
+                        let tra_id = &f_weixin.tra_id;
+                        let wx_hook = &f_weixin.wx_hook;
+                    let slack_hook = &f_weixin.slack_hook;
+                        if new_tra_id == tra_id {
+
+                            if wx_hook.len() !=0 {
+                                let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+            wxbot.push_str(&wx_hook);
             info!("wxbot  {}", wxbot);
             let wx_robot = WxbotHttpClient::new(&wxbot);
-            if i != 0 {
-                let sender = format!("ByBit交易所的----{}现货账号", name);
-                let content = format!("一分钟内没有新挂单");
-                wx_robot.send_text(&sender, &content).await;
+
+            if alarm == "true" {
+                if i != 0 {
+                    let sender = format!("ByBit交易所的----{}现货账号", name);
+                    let content = format!("一分钟内没有新挂单");
+                    wx_robot.send_text(&sender, &content).await;
+                }
             }
+
+
+            
+                                
+                            }
+
+                            if slack_hook.len() != 0 {
+                                let mut slackrobot = String::from("https://hooks.slack.com/services/");
+                slackrobot.push_str(&slack_hook);
+                let slack_robot = SlackHttpClient::new(&slackrobot);
+
+
+                if alarm == "true" {
+                    if i != 0 {
+                        let sender = format!("ByBit交易所的----{}现货账号", name);
+                        let content = format!("一分钟内没有新挂单");
+                        slack_robot.send_text(&sender, &content).await;
+                    }
+                }
+
+                                
+
+                            }
+                            
+            
                         }
                     }
                     
@@ -234,15 +302,39 @@ async fn real_time(
                     if vec.len() == 0 {
                         if i != 0 {
                             for f_weixin in &weixin {
-                                let new_wx_hook = &f_weixin.wx_hook;
-                                if new_wx_hook == wx_hook {
-                                    let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
-                    wxbot.push_str(new_wx_hook);
+                                let tra_id = &f_weixin.tra_id;
+                                let wx_hook = &f_weixin.wx_hook;
+                    let slack_hook = &f_weixin.slack_hook;
+                                if new_tra_id == tra_id {
+                                    if wx_hook.len() != 0 {
+                                        let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+                    wxbot.push_str(&wx_hook);
                     info!("wxbot  {}", wxbot);
                     let wx_robot = WxbotHttpClient::new(&wxbot);
-                    let sender = format!("ByBit交易所的----{}期货账号", name);
+
+                    if alarm == "true" {
+                        let sender = format!("ByBit交易所的----{}期货账号", name);
                             let content = format!("一分钟内没有新挂单");
                             wx_robot.send_text(&sender, &content).await;
+                    }
+
+
+                                    }
+
+                                    if slack_hook.len() != 0 {
+                                        let mut slackrobot = String::from("https://hooks.slack.com/services/");
+                slackrobot.push_str(&slack_hook);
+                let slack_robot = SlackHttpClient::new(&slackrobot);
+
+                if alarm == "true" {
+                    let sender = format!("ByBit交易所的----{}期货账号", name);
+                        let content = format!("一分钟内没有新挂单");
+                        slack_robot.send_text(&sender, &content).await;
+                }
+
+                                    }
+                                     
+                    
                                 }
                             }
                             
@@ -271,12 +363,15 @@ async fn real_time(
     );
     let name = tra_name;
     let alarm = tra_alarm;
-    let wx_hook = &f_config.wx_hook;
         for f_weixin in &weixin {
-            let new_wx_hook = &f_weixin.wx_hook;
-            if new_wx_hook == wx_hook {
-                let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
-wxbot.push_str(new_wx_hook);
+            let tra_id = &f_weixin.tra_id;
+            let wx_hook = &f_weixin.wx_hook;
+            let slack_hook = &f_weixin.slack_hook;
+            if new_tra_id == tra_id {
+
+                if wx_hook.len() != 0 {
+                    let mut wxbot = String::from("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=");
+wxbot.push_str(wx_hook);
 info!("wxbot  {}", wxbot);
 let wx_robot = WxbotHttpClient::new(&wxbot);
 
@@ -301,6 +396,40 @@ if alarm == "true"{
         // net_worth_histories.push_back(Value::from(new_account_object));
     }
 }
+
+                }
+
+
+                if slack_hook.len() != 0 {
+                    let mut slackrobot = String::from("https://hooks.slack.com/services/");
+                slackrobot.push_str(&slack_hook);
+                let slack_robot = SlackHttpClient::new(&slackrobot);
+
+
+                if alarm == "true"{
+                    if let Some(data) = binance_papi_api.get_open_orders(None).await {
+                        let v: Value = serde_json::from_str(&data).unwrap();
+                        let vec = v.as_array().unwrap();
+                        
+                        println!(" 名字{}",  name);
+                        if vec.len() == 0 {
+                            if i != 0 {
+                                let sender = format!("Binance交易所的----{}统一账号", name);
+                                let content = format!("一分钟内没有新挂单");
+                                slack_robot.send_text(&sender, &content).await;
+                            }
+                            continue;
+                
+                        } else {
+                          println!("当前有挂单{}", vec.len());
+                        }
+                        // net_worth = notional_total/ori_fund;
+                        // net_worth_histories.push_back(Value::from(new_account_object));
+                    }
+                }
+
+                }
+                
 
 
             }

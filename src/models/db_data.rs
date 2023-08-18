@@ -1,3 +1,5 @@
+use std::string;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -17,9 +19,14 @@ pub struct AccProd {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccWeixin {
-    pub wx_id: u64,
+    pub id: u64,
+    pub tra_id: u64,
+    pub wx_hook: String,
     pub wx_name: String,
-    pub wx_hook: String
+    pub slack_hook: String,
+    pub slack_name: String,
+    pub mess_hook: String,
+    pub mess_name: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
