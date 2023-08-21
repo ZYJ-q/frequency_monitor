@@ -33,7 +33,7 @@ impl TradeMapper {
     // 连接数据库
     let mut conn = get_connect();
     let res = conn.query_map(
-      r"select * from test_notices",
+      r"select * from notices",
       |( id, tra_id, wx_hook, wx_name, slack_hook, slack_name, mess_hook, mess_name)| {
         AccWeixin{ id, tra_id, wx_hook, wx_name, slack_hook, slack_name, mess_hook, mess_name}
       } 
