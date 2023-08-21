@@ -1,7 +1,8 @@
 
+use std::f32::consts::E;
 // use std::collections::VecDeque;
 use std::{collections::HashMap, fs, time::Duration};
-use log::{info, warn};
+use log::{info, warn, error};
 use serde_json::{Map, Value};
 // use tokio::{sync::broadcast::{self, Receiver}};
 use open_order_alarm::adapters::binance::futures::http::actions::BinanceFuturesApi;
@@ -55,40 +56,6 @@ async fn real_time(
 
         // 监控服务器状态
         info!("server process");
-        // let mut server_status: VecDeque<Value> = VecDeque::new();
-        // let mut server_process: Map<String, Value> = Map::new();
-        // print!("判断是true还是false {}", ssh_api.search_py_ps());
-        // match ssh_api.search_py_ps() {
-        //     true => {
-        //         if !running {
-        //             running = true;
-        //             print!("改变running的值{}", running);
-        //             // let sender = "程序开启";
-        //             // let content = format!("process name: {}", ssh_api.get_root_name());
-        //             // wx_robot.send_text(sender, &content).await;
-        //         }
-        //         server_process.insert(String::from("status"), Value::from("running"));
-        //         server_process.insert(String::from("info"), Value::from(""));
-        //     }
-        //     false => {
-        //         server_process.insert(String::from("status"), Value::from("stopped"));
-        //         let mut info = ssh_api.download_log();
-        //         if running {
-        //             running = false;
-        //             // let sender = "程序停止";
-        //             let content;
-        //             if info == "" {
-        //                 content = format!("{}: 未找到错误，请查看日志", ssh_api.get_root_name());
-        //             }else {
-        //                 content = format!("{}: {}", ssh_api.get_root_name(), &info);
-        //             }
-        //             // wx_robot.send_text(sender, &content).await;
-        //             info = content;
-        //         }
-        //         server_process.insert(String::from("info"), Value::from(info));
-        //     }
-        // }
-        // map.insert(String::from("server"), Value::from(server_process));
         
         let res = trade_mapper::TradeMapper::get_positions();
         let weixin = trade_mapper::TradeMapper::get_weixin().unwrap();
@@ -153,7 +120,10 @@ async fn real_time(
                 }
                 // net_worth = notional_total/ori_fund;
                 // net_worth_histories.push_back(Value::from(new_account_object));
+            } else {
+                error!("Can't get bian_futures_opens {} account.", name);
             }
+
         }
 
                         }
@@ -183,6 +153,8 @@ async fn real_time(
                         }
                         // net_worth = notional_total/ori_fund;
                         // net_worth_histories.push_back(Value::from(new_account_object));
+                    } else {
+                        error!("Can't get bian_futures_opens {} account.", name);
                     }
                 }
 
@@ -220,6 +192,8 @@ async fn real_time(
                     println!("现货usdt挂单数量{:?}", vec.len());
                     // net_worth = notional_total/ori_fund;
                     // net_worth_histories.push_back(Value::from(new_account_object));
+                } else {
+                    error!("Can't get bybit_futures_spot_opens {} account.", name);
                 }
 
                 if let Some(data) = bybit_futures_api.get_bybit_usdc_open_orders().await {
@@ -231,6 +205,8 @@ async fn real_time(
                     println!("现货挂单数量{:?}", vec_usdc.len());
                     // net_worth = notional_total/ori_fund;
                     // net_worth_histories.push_back(Value::from(new_account_object));
+                } else {
+                    error!("Can't get bybit_futures_spot_opens {} account.", name);
                 }
 
 
@@ -346,6 +322,8 @@ async fn real_time(
                     }
                     // net_worth = notional_total/ori_fund;
                     // net_worth_histories.push_back(Value::from(new_account_object));
+                } else {
+                    error!("Can't get bybit_futures_linear_opens {} account.", name);
                 }
         }
     }
@@ -394,6 +372,8 @@ if alarm == "true"{
         }
         // net_worth = notional_total/ori_fund;
         // net_worth_histories.push_back(Value::from(new_account_object));
+    } else {
+        error!("Can't get bian_papi_opens {} account.", name);
     }
 }
 
@@ -425,6 +405,8 @@ if alarm == "true"{
                         }
                         // net_worth = notional_total/ori_fund;
                         // net_worth_histories.push_back(Value::from(new_account_object));
+                    } else {
+                        error!("Can't get bian_papi_opens {} account.", name);
                     }
                 }
 

@@ -65,7 +65,10 @@ impl BinanceHttpClient {
             if !params.is_empty() {
                 match serde_json::to_string(&params) {
                     Ok(result) => data_json = result,
-                    Err(e) => error!("error on parase params: {}", e),
+                    Err(e) => {
+                        error!("error on parase params: {}", e);
+                        return None;
+                    }
                 }
             }
         }
@@ -114,20 +117,22 @@ impl BinanceHttpClient {
                     }
                 }
             } else {
-                panic!(
+                error!(
                     "code status error: {}-{}",
                     response.status(),
                     response.text().await.unwrap()
                 );
+                return  None;
             }
         } else {
-            panic!(
+            error!(
                 "none response: {},{},{},{:?}",
                 &method.as_str(),
                 url,
                 need_sign,
                 params
             );
+            return None;
         }
     }
 
@@ -137,16 +142,19 @@ impl BinanceHttpClient {
             Some(data) => {
                 if !data.is_empty() {
                     if data.contains("code") {
-                        panic!("code: {}", data);
+                        error!("code: {}", data);
+                        return None;
                     }else {
                         return Some(data);
                     }
                 } else {
-                    panic!("response is empty");
+                    error!("response is empty");
+                    return None;
                 }
             }
             None => {
-                panic!("handle response failed")
+                error!("handle response failed");
+                return None;
             }
         }
     }
